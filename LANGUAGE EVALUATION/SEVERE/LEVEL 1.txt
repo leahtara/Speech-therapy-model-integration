@@ -1,0 +1,72 @@
+#pip install pyttsx3
+#pip install pygame
+#pip install pygame Pillow
+
+
+import tkinter as tk
+from tkinter import PhotoImage
+from PIL import Image, ImageTk
+import pygame
+import pyttsx3
+
+# Initialize pygame mixer for audio
+pygame.mixer.init()
+
+# Initialize the text-to-speech engine
+engine = pyttsx3.init()
+
+# Function to play audio for the question
+def play_audio():
+    pygame.mixer.music.load("your_audio_file.mp3")
+    pygame.mixer.music.play()
+
+# Function to check if the correct image was clicked
+def check_answer(is_correct):
+    if is_correct:
+        engine.say("Correct")
+    else:
+        engine.say("Wrong")
+    engine.runAndWait()
+
+# Create the main window
+root = tk.Tk()
+root.title("Identification of objects")
+
+# Set the size of the window
+root.geometry("600x600")
+
+# Create a label for the question
+question_label = tk.Label(root, text="Which of the following is the dog?", font=("Arial", 16))
+question_label.pack(pady=20)
+
+# Create a button to play the audio question
+play_button = tk.Button(root, text="Play Audio", command=play_audio)
+play_button.pack(pady=20)
+
+# Create a label for images
+frame = tk.Frame(root)
+frame.pack()
+
+# Keep a reference list for the images
+image_refs = []
+
+# Load images and create buttons for each image
+def create_image_button(image_path, is_correct):
+    try:
+        image = Image.open(image_path)
+        image = image.resize((150, 150), Image.Resampling.LANCZOS)  # Resize the image
+        photo = ImageTk.PhotoImage(image)
+        image_refs.append(photo)  # Store the image reference to prevent garbage collection
+        button = tk.Button(frame, image=photo, command=lambda: check_answer(is_correct))
+        button.photo = photo  # Keep a reference to avoid garbage collection
+        button.pack(side="left", padx=10)
+    except Exception as e:
+        print(f"Error loading image {image_path}: {e}")
+
+# Create buttons for the correct and incorrect images
+create_image_button(r"C:\Users\Lenovo\Downloads\dog_image.jpg", True)  # Correct image
+create_image_button(r"C:\Users\Lenovo\Downloads\cat_image.jpg", False)  # Incorrect image 1
+create_image_button(r"C:\Users\Lenovo\Downloads\fox_image.jpg", False)  # Incorrect image 2
+
+# Start the main loop
+root.mainloop()

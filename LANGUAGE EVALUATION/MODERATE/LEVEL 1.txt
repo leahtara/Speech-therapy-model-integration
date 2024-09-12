@@ -1,0 +1,55 @@
+
+#pip install pyttsx3 pillow
+
+
+import tkinter as tk
+from tkinter import PhotoImage
+import pyttsx3
+from PIL import Image, ImageTk
+
+# Initialize text-to-speech engine
+engine = pyttsx3.init()
+
+# Function to speak the name of the picture
+def say_name(image_name):
+    engine.say(image_name)
+    engine.runAndWait()
+
+# GUI window setup
+root = tk.Tk()
+root.title("Picture Name Speaker")
+root.geometry("600x400")
+
+# Frame to hold the images
+frame = tk.Frame(root)
+frame.pack(pady=20)
+
+# List of images and their names
+image_files = [
+    ("spoon", "C:\\Users\\Lenovo\\Downloads\\spoon_image.jpg"),
+    ("cucumber", "C:\\Users\\Lenovo\\Downloads\\cucumber_image.jpg"),
+    ("Cat", "C:\\Users\\Lenovo\\Downloads\\cat_image.jpg"),
+    ("Onion", "C:\\Users\\Lenovo\\Downloads\\onion.jpg"),
+    ("television", "C:\\Users\\Lenovo\\Downloads\\tv_image.jpg"),
+    ("Tomato","C:\\Users\\Lenovo\\Downloads\\tomato.jpeg"),
+    ("fox", "C:\\Users\\Lenovo\\Downloads\\fox_image.jpg"),
+    ("mango", "C:\\Users\\Lenovo\\Downloads\\mango.jpg")
+]
+
+# Load images and create buttons
+for image_name, image_file in image_files:
+    try:
+        # Load image using PIL and resize
+        img = Image.open(image_file)
+        img = img.resize((100, 100), Image.Resampling.LANCZOS)
+        img = ImageTk.PhotoImage(img)
+
+        # Create a button with image
+        button = tk.Button(frame, image=img, command=lambda name=image_name: say_name(name))
+        button.image = img  # Keep a reference of the image to prevent garbage collection
+        button.pack(side="left", padx=10)
+    
+    except Exception as e:
+        print(f"Error loading {image_file}: {e}")
+
+root.mainloop()

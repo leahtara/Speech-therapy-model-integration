@@ -1,0 +1,85 @@
+import tkinter as tk
+from tkinter import PhotoImage
+import pyttsx3
+import speech_recognition as sr
+from PIL import Image, ImageTk
+
+# Initialize text-to-speech engine
+engine = pyttsx3.init()
+
+# Initialize speech recognizer
+recognizer = sr.Recognizer()
+
+# Function to speak the name of the picture
+def say_name(image_name):
+    engine.say(image_name)
+    engine.runAndWait()
+    
+
+
+# GUI window setup
+root = tk.Tk()
+root.title("Picture Name Speaker")
+root.geometry("600x500")
+
+# Frame to hold the images
+frame = tk.Frame(root)
+frame.pack(pady=20)
+
+# Label to show the result of the recognition
+result_label = tk.Label(root, text="", font=("Helvetica", 16))
+result_label.pack(pady=20)
+
+# List of images and their names
+image_files = [
+    ("a", "C:\\Users\\Lenovo\\Downloads\\alphabets\\a.png"),
+    ("b", "C:\\Users\\Lenovo\\Downloads\\alphabets\\b.png"),
+    ("c", "C:\\Users\\Lenovo\\Downloads\\alphabets\\c.png"),
+    ("d", "C:\\Users\\Lenovo\\Downloads\\alphabets\\d.png"),
+    ("e", "C:\\Users\\Lenovo\\Downloads\\alphabets\\e.png"),
+    ("f","C:\\Users\\Lenovo\\Downloads\\alphabets\\f.png"),
+    ("g", "C:\\Users\\Lenovo\\Downloads\\alphabets\\g.png"),
+    ("h", "C:\\Users\\Lenovo\\Downloads\\alphabets\\h.png"),
+    ("i", "C:\\Users\\Lenovo\\Downloads\\alphabets\\i.png"),
+    ("j", "C:\\Users\\Lenovo\\Downloads\\alphabets\\j.png"),
+    ("k", "C:\\Users\\Lenovo\\Downloads\\alphabets\\k.png"),
+    ("l", "C:\\Users\\Lenovo\\Downloads\\alphabets\\l.png"),
+    ("m", "C:\\Users\\Lenovo\\Downloads\\alphabets\\m.png"),
+    ("n", "C:\\Users\\Lenovo\\Downloads\\alphabets\\n.png"),
+    ("o", "C:\\Users\\Lenovo\\Downloads\\alphabets\\o.png"),
+    ("p", "C:\\Users\\Lenovo\\Downloads\\alphabets\\p.png"),
+    ("q", "C:\\Users\\Lenovo\\Downloads\\alphabets\\q.png"),
+    ("r", "C:\\Users\\Lenovo\\Downloads\\alphabets\\r.png"),
+    ("s", "C:\\Users\\Lenovo\\Downloads\\alphabets\\s.png"),
+    ("t", "C:\\Users\\Lenovo\\Downloads\\alphabets\\t.png"),
+    ("u", "C:\\Users\\Lenovo\\Downloads\\alphabets\\u.png"),
+    ("v", "C:\\Users\\Lenovo\\Downloads\\alphabets\\v.png"),
+    ("w", "C:\\Users\\Lenovo\\Downloads\\alphabets\\w.png"),
+    ("x", "C:\\Users\\Lenovo\\Downloads\\alphabets\\x.png"),
+    ("y", "C:\\Users\\Lenovo\\Downloads\\alphabets\\y.png"),
+    ("z", "C:\\Users\\Lenovo\\Downloads\\alphabets\\z.png")
+    
+]
+
+# Load images and create buttons
+for index, (image_name, image_file) in enumerate(image_files):
+    try:
+        # Load image using PIL and resize
+        img = Image.open(image_file)
+        img = img.resize((100, 100), Image.Resampling.LANCZOS)
+        img = ImageTk.PhotoImage(img)
+
+        # Create a button with the image
+        button = tk.Button(frame, image=img, command=lambda name=image_name: say_name(name))
+        button.image = img  # Keep a reference of the image to prevent garbage collection
+
+        # Arrange the buttons in a grid (4x6)
+        row = index // 6  # Compute row number (4 rows)
+        col = index % 6  # Compute column number (6 columns)
+        button.grid(row=row, column=col, padx=10, pady=10)
+
+    except Exception as e:
+        print(f"Error loading {image_file}: {e}")
+
+
+root.mainloop()

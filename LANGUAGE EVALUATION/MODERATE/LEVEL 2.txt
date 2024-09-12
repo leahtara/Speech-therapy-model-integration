@@ -1,0 +1,105 @@
+#pip install SpeechRecognition pyttsx3
+#pip install pyaudio
+#pip install SpeechRecognition pyttsx3 language-tool-python Pillow
+
+import tkinter as tk
+import speech_recognition as sr
+import pyttsx3
+import threading
+
+# Initialize text-to-speech engine
+engine = pyttsx3.init()
+
+# Global flag to stop listening
+listening = False
+
+# Function to speak a message
+def speak(message):
+    engine.say(message)
+    engine.runAndWait()
+
+# Function to recognize counting and check if it's correct
+def recognize_counting():
+    global listening
+    r = sr.Recognizer()
+    listening = True
+    status_label.config(text="Listening for your count from 1 to 10...")
+    
+    with sr.Microphone() as source:
+        try:
+            # Listen in a separate thread to allow stopping
+            audio = r.listen(source, timeout=5)
+            
+            if listening:
+                # Recognize speech using Google Speech Recognition
+                text = r.recognize_google(audio)
+                result_label.config(text=f"You said: {text}")
+                print(f"You said: {text}")
+
+                # Normalize the recognized text (extract the digits from spoken words)
+                recognized_numbers = [word for word in text.split() if word.isdigit()]
+                correct_sequence = [str(i) for i in range(1, 11)]
+                
+                # Check if the recognized numbers match the correct sequence
+                if recognized_numbers == correct_sequence:
+                    speak("You counted correctly from 1 to 10!")
+                    result_label.config(text="Correct! You counted from 1 to 10.")
+                else:
+                    speak("You did not count correctly. Please try again.")
+                    result_label.config(text="Incorrect counting. Please try again.")
+            else:
+                result_label.config(text="Listening was stopped.")
+        except sr.UnknownValueError:
+            if listening:
+                speak("Sorry, I could not understand your speech.")
+                result_label.config(text="Sorry, I could not understand your speech.")
+        except sr.RequestError as e:
+            if listening:
+                speak("Sorry, there was an error with the speech recognition service.")
+                result_label.config(text=f"Error: {e}")
+        except Exception as e:
+            if listening:
+                result_label.config(text=f"Error: {e}")
+        
+    # Update status when done
+    status_label.config(text="")
+
+# Function to handle starting of the speech recognition in a new thread
+def start_listening():
+    result_label.config(text="")
+    listening_thread = threading.Thread(target=recognize_counting)
+    listening_thread.start()
+
+# Function to stop listening
+def stop_listening():
+    global listening
+    listening = False
+    status_label.config(text="Stopped listening.")
+
+# GUI setup
+root = tk.Tk()
+root.title("Counting Checker")
+root.geometry("400x300")
+
+# Instruction label
+instruction_label = tk.Label(root, text="Press the button and count from 1 to 10", font=("Arial", 14))
+instruction_label.pack(pady=20)
+
+# Button to start speech recognition
+start_button = tk.Button(root, text="Start Counting", command=start_listening, font=("Arial", 14), bg="blue", fg="white")
+start_button.pack(pady=10)
+
+# Button to stop speech recognition
+stop_button = tk.Button(root, text="Stop", command=stop_listening, font=("Arial", 14), bg="red", fg="white")
+stop_button.pack(pady=10)
+
+# Label to display results
+result_label = tk.Label(root, text="", font=("Arial", 12))
+result_label.pack(pady=10)
+
+# Status label for listening state
+status_label = tk.Label(root, text="", font=("Arial", 10), fg="gray")
+status_label.pack(pady=10)
+
+# Start the GUI loop
+root.mainloop()
