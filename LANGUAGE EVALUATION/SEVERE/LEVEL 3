@@ -1,0 +1,92 @@
+import tkinter as tk
+from tkinter import messagebox
+import pygame
+import random
+import os
+
+# Initialize pygame mixer for playing mp3 files
+pygame.mixer.init()
+
+# List of questions with corresponding mp3 files (assumed to be in the same directory)
+questions = [
+    {"text": "Does a dog have 4 legs?", "audio": "question1.mp3"},
+    {"text": "Is Monday after Tuesday?", "audio": "question2.mp3"},
+    {"text": "Are you a cloud?", "audio": "question3.mp3"},
+    {"text": "Does February have 45 days?", "audio": "question4.mp3"},
+    {"text": "Are potato chips made out of potatoes?", "audio": "question5.mp3"}
+]
+
+# Shuffle questions to present in random order
+random.shuffle(questions)
+
+# Create a simple tkinter GUI with Yes and No buttons
+class QuizApp:
+    def __init__(self, root):
+        self.root = root
+        self.root.title("Yes/No Question Quiz")
+
+        self.current_question = 0  # Keep track of current question
+
+        # Question Label
+        self.question_label = tk.Label(root, text="Press Start to begin", font=("Helvetica", 16))
+        self.question_label.pack(pady=20)
+
+        # Start Button
+        self.start_button = tk.Button(root, text="Start", font=("Helvetica", 14), command=self.play_next_question)
+        self.start_button.pack(pady=10)
+
+        # Yes/No Buttons
+        self.yes_button = tk.Button(root, text="Yes", font=("Helvetica", 14), command=self.answer_yes, state=tk.DISABLED)
+        self.no_button = tk.Button(root, text="No", font=("Helvetica", 14), command=self.answer_no, state=tk.DISABLED)
+        
+        self.yes_button.pack(side=tk.LEFT, padx=20, pady=10)
+        self.no_button.pack(side=tk.RIGHT, padx=20, pady=10)
+
+    def play_next_question(self):
+        # Check if all questions have been asked
+        if self.current_question < len(questions):
+            question = questions[self.current_question]
+
+            # Update question label
+            self.question_label.config(text=question["text"])
+
+            # Play the corresponding mp3 file
+            pygame.mixer.music.load(question["audio"])
+            pygame.mixer.music.play()
+
+            # Enable Yes/No buttons
+            self.yes_button.config(state=tk.NORMAL)
+            self.no_button.config(state=tk.NORMAL)
+        else:
+            # If all questions are done
+            messagebox.showinfo("Quiz Finished", "You have completed all the questions!")
+            self.root.quit()
+
+    def answer_yes(self):
+        self.record_answer("Yes")
+        self.next_question()
+
+    def answer_no(self):
+        self.record_answer("No")
+        self.next_question()
+
+    def next_question(self):
+        self.current_question += 1
+        self.play_next_question()
+
+    def record_answer(self, answer):
+        # Record user's answer here (for example, saving to a file or a list)
+        print(f"Question {self.current_question + 1}: {answer}")
+        
+        # Disable Yes/No buttons until next question is played
+        self.yes_button.config(state=tk.DISABLED)
+        self.no_button.config(state=tk.DISABLED)
+
+# Create and run the GUI
+if __name__ == "__main__":
+    root = tk.Tk()
+    app = QuizApp(root)
+    root.mainloop()
+
+    # Quit pygame mixer
+    pygame.mixer.quit()
